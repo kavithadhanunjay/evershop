@@ -72,8 +72,13 @@ jobs:
 
       - name: Re-link node binaries (fast)
         run: npm install --prefer-offline --no-audit
+      - name: Setup test env
+        run: |
+          cp .env.example .env || true
 
-      - run: npm test --if-present -- --passWithNoTests
+      - name: Run tests
+        run: npm test -- --detectOpenHandles
+
 
 
   package:
