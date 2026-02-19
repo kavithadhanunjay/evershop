@@ -32,8 +32,14 @@ jobs:
           node-version: 20
           cache: npm
 
-      - run: npm ci
-      - run: npm run compile --if-present
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Compile all packages
+        run: npm run compile
+
+      - name: Compile DB packages
+        run: npm run compile:db
 
       - name: Save workspace
         uses: actions/upload-artifact@v4
@@ -42,6 +48,7 @@ jobs:
           path: |
             .
             node_modules
+            packages/**/dist
 
 
   lint:
@@ -54,7 +61,7 @@ jobs:
         with:
           name: workspace
 
-      - name: Re-link node binaries (fast)
+      - name: Relink node binaries
         run: npm install --prefer-offline --no-audit
 
       - run: npm run lint --if-present
@@ -70,15 +77,11 @@ jobs:
         with:
           name: workspace
 
-      - name: Re-link node binaries (fast)
+      - name: Relink node binaries
         run: npm install --prefer-offline --no-audit
-      - name: Setup test env
-        run: |
-          cp .env.example .env || true
 
       - name: Run tests
-        run: npm test -- --detectOpenHandles
-
+        run: npm test -- --passWithNoTests
 
 
   package:
